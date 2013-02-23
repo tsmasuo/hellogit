@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Bonus {
+	
+	
 	public static int getBonus(
 			int basePay, String rank) {
 		int rate = 0;
