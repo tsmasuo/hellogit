@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<property name="output" value="build/output"/>
+	<target name="clean">
+		<delete dir="${output}"/>
+	</target>
+	<target name="compile" depends="clean">
+		<mkdir dir="${output}/classes"/>
+		<javac srcdir="src" destdir="${output}/classes" encoding="sjis"/>
+	</target>
+	<target name="unit-test" depends="compile">
+		<path id="for-unit-test">
+			<pathelement location="${output}/classes"/>
+			<pathelement location="${output}/test-classes"/>
+			<pathelement location="build/lib/junit-4.8.2.jar"/>
+		</path>
+		<mkdir dir="${output}/test-result"/>
+		<mkdir dir="${output}/test-classes"/>
+		
+		<javac srcdir="test/src" destdir="${output}/test-classes">
+			<classpath refid="for-unit-test"/>
+		</javac>
+		
+		
+		<junit>
+			<classpath refid="for-unit-test"/>
+			<batchtest todir="${output}/test-result">
+				<fileset dir="test/src">
+					<include name="**/*Test.java"/>
+				</fileset>
+				<formatter type="xml"/>
+			</batchtest>			
+		</junit>
+		<junitreport todir="${output}/test-result">
+			<fileset dir="${output}/test-result">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report format="frames" todir="${output}/test-result/report"/>
+		</junitreport>	
+	</target>
+	<target name="create-jar" depends="compile">
+		<jar basedir="${output}/classes" jarfile="${output}/bonus.jar">
+			<manifest>
+				<attribute name="Main-Class" value="tools.Bonus"/>
+			</manifest>
+		</jar>
+	</target>
+	<target name="release" depends="unit-test, create-jar">
+		<mkdir dir="tmp"/>
+		<copy todir="tmp" file="${output}/bonus.jar"/>
+		<copy todir="tmp" file="README.txt"/>
+		<copy todir="tmp/src/">
+			<fileset dir="src"/>
+		</copy>
+		<javadoc sourcepath="src" destdir="tmp/javadoc" />
+		<tstamp/>
+		<zip destfile="${output}/bonus_${DSTAMP}${TSTAMP}.zip" basedir="tmp"/>
+		<delete dir="tmp"/>
+	</target>
+</project>
